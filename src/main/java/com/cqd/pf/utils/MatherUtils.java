@@ -1,33 +1,21 @@
 package com.cqd.pf.utils;
 
+import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
 
 @Component
 public class MatherUtils {
 
-    public MatcherResult findFirstBestMath(String input, String pattern) {
-        int position = 0;
-        int typos = pattern.length();
+    @SneakyThrows
+    public int getTypos(String input, String pattern) {
+        Thread.sleep(1000);
 
-        for (int i = 0; i <= input.length() - pattern.length(); i++) {
-            String inputPart = input.substring(i, i + pattern.length());
-
-            int typoCount = 0;
-            for (int j = 0; j < inputPart.length(); j++) {
-                if (inputPart.charAt(j) != pattern.charAt(j)) {
-                    typoCount++;
-                }
-            }
-            if (typoCount == 0) {
-                position = i;
-                typos = 0;
-                return new MatcherResult(position, typos);
-            }
-            if (typoCount < typos) {
-                position = i;
-                typos = typoCount;
+        int typos = 0;
+        for (int i = 0; i < input.length(); i++) {
+            if (input.charAt(i) != pattern.charAt(i)) {
+                typos++;
             }
         }
-        return new MatcherResult(position, typos);
+        return typos;
     }
 }

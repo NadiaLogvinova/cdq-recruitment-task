@@ -2,49 +2,70 @@ package com.cqd.pf.service;
 
 import com.cqd.pf.document.Task;
 import com.cqd.pf.errorhandling.exception.ServiceException;
-import com.cqd.pf.errorhandling.message.Message;
 import com.cqd.pf.model.TaskRequest;
-import com.cqd.pf.repository.TaskRepository;
+import com.cqd.pf.repository.TaskDAO;
 import com.cqd.pf.utils.MatcherResult;
 import com.cqd.pf.utils.MatherUtils;
-import lombok.AllArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
-@AllArgsConstructor
-public class TaskService {
+@RequiredArgsConstructor
+public class TaskService implements AsyncJob{
 
-    private static final Sort DEFAULT_SORT = Sort.by("id").ascending();
+    private final MatherUtils matherUtils;
 
-    private MatherUtils matherUtils;
+    private final TaskDAO taskDAO;
 
-    private TaskRepository taskRepository;
+    private ThreadLocal<String> jobId = new ThreadLocal<>();
 
-    public String findBestMatch(TaskRequest taskRequest) {
-        MatcherResult matcherResult = matherUtils.findFirstBestMath(taskRequest.getInput(), taskRequest.getPattern());
-        Task task = Task.builder()
-                .position(matcherResult.getPosition())
-                .typos(matcherResult.getTypo())
-                .build();
-        taskRepository.save(task);
+    public MatcherResult findBestMatch(TaskRequest taskRequest) {
+        String input = taskRequest.getInput();
+        String pattern = taskRequest.getPattern();
 
-        return task.getId();
+        int position = 0;
+        int minTypos = pattern.length();
+
+        for (int i = 0; i <= input.length() - pattern.length(); i++) {
+            setProgress(100 * i/(input.length() - pattern.length() + 1));
+            int typos = matherUtils.getTypos(input.substring(i, i + pattern.length()), pattern);
+            minTypos = Math.min(minTypos, typos);
+            if (minTypos == 0) {
+                new MatcherResult(position, typos);
+            }
+        }
+        return new MatcherResult(position, minTypos);
     }
 
     public Task getById(String id) {
-        return taskRepository.findById(id)
-                .orElseThrow(() -> new ServiceException(String.format(Message.TASK_DOES_NOT_EXIST, id), HttpStatus.NOT_FOUND));
+        return taskDAO.getById(id);
     }
 
-    public List<Task> getTasks(Pageable original) {
-        Pageable sortedPageable = PageRequest.of(original.getPageNumber(), original.getPageSize(), DEFAULT_SORT);
-        return taskRepository.findAll(sortedPageable).stream().toList();
+    public List<Task> getTasks(Pageable pageable) {
+        return taskDAO.getTasks(pageable);
     }
+
+    @Override
+    public void start(String id, Object params) {
+        if (params instanceof TaskRequest taskRequest) {
+            jobId.set(id);
+            MatcherResult bestMatch = findBestMatch(taskRequest);
+            setResult(bestMatch);
+        } else {
+            throw new ServiceException("Internal server error", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    private void setProgress(Integer progress) {
+        taskDAO.setProgress(jobId.get(), progress);
+    }
+
+    private void setResult(MatcherResult result) {
+        taskDAO.setResult(jobId.get(), result);
+    }
+
 }
