@@ -2,7 +2,6 @@ package com.cqd.pf.controller;
 
 import com.cqd.pf.document.Task;
 import com.cqd.pf.model.TaskRequest;
-import com.cqd.pf.service.AsyncService;
 import com.cqd.pf.service.TaskService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,13 +20,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TaskController {
 
-    private final AsyncService asyncService;
-
     private final TaskService taskService;
 
     @PostMapping
     public String createTask(@RequestBody @Valid TaskRequest taskRequest) {
-        return asyncService.postAsync(taskService, taskRequest);
+        return taskService.postTask(taskRequest);
     }
 
     @GetMapping
