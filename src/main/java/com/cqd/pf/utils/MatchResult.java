@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public class MatcherResult {
+public class MatchResult {
 
     private Integer position;
 

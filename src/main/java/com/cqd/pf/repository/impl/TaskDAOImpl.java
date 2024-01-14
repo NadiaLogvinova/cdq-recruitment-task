@@ -3,31 +3,25 @@ package com.cqd.pf.repository.impl;
 import com.cqd.pf.document.Task;
 import com.cqd.pf.errorhandling.exception.ServiceException;
 import com.cqd.pf.errorhandling.message.Message;
-import com.cqd.pf.repository.TaskRepository;
 import com.cqd.pf.repository.TaskDAO;
-import com.cqd.pf.utils.MatcherResult;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.cqd.pf.repository.TaskRepository;
+import com.cqd.pf.utils.MatchResult;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
+@RequiredArgsConstructor
 public class TaskDAOImpl implements TaskDAO {
 
     private static final Sort DEFAULT_SORT = Sort.by("id").ascending();
 
-    @Autowired
-    private TaskRepository taskRepository;
-
-    @Autowired
-    private MongoTemplate mongoTemplate;
+    private final TaskRepository taskRepository;
 
     @Override
     public Task getById(String id) {
@@ -42,16 +36,18 @@ public class TaskDAOImpl implements TaskDAO {
     }
 
     @Override
+    //todo update progress
     public void setProgress(String id, Integer progress) {
-        Task task = mongoTemplate.findOne(Query.query(Criteria.where("_id").is(id)), Task.class);
+        Task task = taskRepository.findById(id).get();
         task.setProgress(progress);
 
         taskRepository.save(task);
     }
 
     @Override
-    public void setResult(String jobId, MatcherResult result) {
-        Task task = mongoTemplate.findOne(Query.query(Criteria.where("_id").is(jobId)), Task.class);
+    //todo why jobId here?
+    public void setResult(String jobId, MatchResult result) {
+        Task task = taskRepository.findById(jobId).get();
         task.setProgress(100);
         task.setPosition(result.getPosition());
         task.setTypos(result.getTypo());

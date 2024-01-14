@@ -1,7 +1,6 @@
 package com.cqd.pf.errorhandling.exception;
 
 import lombok.Getter;
-import lombok.ToString;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.Assert;
 

@@ -2,9 +2,10 @@ package com.cqd.pf.service;
 
 import com.cqd.pf.document.Task;
 import com.cqd.pf.errorhandling.exception.ServiceException;
+import com.cqd.pf.errorhandling.message.Message;
 import com.cqd.pf.model.TaskRequest;
 import com.cqd.pf.repository.TaskDAO;
-import com.cqd.pf.utils.MatcherResult;
+import com.cqd.pf.utils.MatchResult;
 import com.cqd.pf.utils.MatherUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -15,15 +16,16 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class TaskService implements AsyncJob{
+// todo: create interface
+public class TaskService implements AsyncJob {
 
     private final MatherUtils matherUtils;
 
     private final TaskDAO taskDAO;
 
-    private ThreadLocal<String> jobId = new ThreadLocal<>();
+    private final ThreadLocal<String> jobId = new ThreadLocal<>();
 
-    public MatcherResult findBestMatch(TaskRequest taskRequest) {
+    public MatchResult findBestMatch(TaskRequest taskRequest) {
         String input = taskRequest.getInput();
         String pattern = taskRequest.getPattern();
 
@@ -31,14 +33,14 @@ public class TaskService implements AsyncJob{
         int minTypos = pattern.length();
 
         for (int i = 0; i <= input.length() - pattern.length(); i++) {
-            setProgress(100 * i/(input.length() - pattern.length() + 1));
+            setProgress(100 * i / (input.length() - pattern.length() + 1));
             int typos = matherUtils.getTypos(input.substring(i, i + pattern.length()), pattern);
             minTypos = Math.min(minTypos, typos);
             if (minTypos == 0) {
-                new MatcherResult(position, typos);
+                new MatchResult(position, typos);
             }
         }
-        return new MatcherResult(position, minTypos);
+        return new MatchResult(position, minTypos);
     }
 
     public Task getById(String id) {
@@ -53,10 +55,11 @@ public class TaskService implements AsyncJob{
     public void start(String id, Object params) {
         if (params instanceof TaskRequest taskRequest) {
             jobId.set(id);
-            MatcherResult bestMatch = findBestMatch(taskRequest);
+            MatchResult bestMatch = findBestMatch(taskRequest);
             setResult(bestMatch);
+            jobId.remove();
         } else {
-            throw new ServiceException("Internal server error", HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new ServiceException(Message.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -64,7 +67,7 @@ public class TaskService implements AsyncJob{
         taskDAO.setProgress(jobId.get(), progress);
     }
 
-    private void setResult(MatcherResult result) {
+    private void setResult(MatchResult result) {
         taskDAO.setResult(jobId.get(), result);
     }
 
