@@ -7,6 +7,7 @@ import com.cqd.pf.repository.TaskDAO;
 import com.cqd.pf.repository.TaskRepository;
 import com.cqd.pf.utils.MatchResult;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -36,21 +37,25 @@ public class TaskDAOImpl implements TaskDAO {
     }
 
     @Override
-    //todo update progress
-    public void setProgress(String id, Integer progress) {
-        Task task = taskRepository.findById(id).get();
-        task.setProgress(progress);
+    @CacheEvict(cacheNames = "task", key = "#id")
+    public void saveProgress(String id, Integer progress) {
+        Task task = Task.builder()
+                .id(id)
+                .progress(progress)
+                .build();
 
         taskRepository.save(task);
     }
 
     @Override
-    //todo why jobId here?
-    public void setResult(String jobId, MatchResult result) {
-        Task task = taskRepository.findById(jobId).get();
-        task.setProgress(100);
-        task.setPosition(result.getPosition());
-        task.setTypos(result.getTypo());
+    @CacheEvict(cacheNames = "task", key = "#id")
+    public void saveResult(String id, MatchResult result) {
+        Task task = Task.builder()
+                .id(id)
+                .progress(100)
+                .position(result.getPosition())
+                .typos(result.getTypo())
+                .build();
 
         taskRepository.save(task);
     }

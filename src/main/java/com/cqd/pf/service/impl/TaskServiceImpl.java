@@ -44,16 +44,16 @@ public class TaskServiceImpl implements TaskService {
 
     private void start(String id, TaskRequest taskRequest) {
         jobId.set(id);
-        MatchResult bestMatch = matherService.findBestMatch(taskRequest, this::setProgress);
-        setResult(bestMatch);
+        MatchResult bestMatch = matherService.findBestMatch(taskRequest, this::saveProgress);
+        saveResult(bestMatch);
         jobId.remove();
     }
 
-    private void setProgress(Integer progress) {
-        taskDAO.setProgress(jobId.get(), progress);
+    private void saveProgress(Integer progress) {
+        taskDAO.saveProgress(jobId.get(), progress);
     }
 
-    private void setResult(MatchResult result) {
-        taskDAO.setResult(jobId.get(), result);
+    private void saveResult(MatchResult result) {
+        taskDAO.saveResult(jobId.get(), result);
     }
 }

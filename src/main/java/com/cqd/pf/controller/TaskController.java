@@ -5,6 +5,7 @@ import com.cqd.pf.model.TaskRequest;
 import com.cqd.pf.service.TaskService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,6 +34,7 @@ public class TaskController {
     }
 
     @GetMapping("/{id}")
+    @Cacheable(value = "task")
     public Task getTaskInfo(@PathVariable String id) {
         return taskService.getById(id);
     }

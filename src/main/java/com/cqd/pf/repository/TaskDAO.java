@@ -8,9 +8,9 @@ import java.util.List;
 
 public interface TaskDAO {
 
-    void setProgress(String id, Integer progress);
+    void saveProgress(String id, Integer progress);
 
-    void setResult(String jobId, MatchResult result);
+    void saveResult(String jobId, MatchResult result);
 
     String createIdle();
 
