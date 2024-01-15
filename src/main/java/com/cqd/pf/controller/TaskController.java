@@ -24,6 +24,7 @@ public class TaskController {
     private final TaskService taskService;
 
     @PostMapping
+    @Cacheable(value = "tasks_id")
     public String createTask(@RequestBody @Valid TaskRequest taskRequest) {
         return taskService.postTask(taskRequest);
     }
@@ -34,7 +35,7 @@ public class TaskController {
     }
 
     @GetMapping("/{id}")
-    @Cacheable(value = "task")
+    @Cacheable(value = "tasks")
     public Task getTaskInfo(@PathVariable String id) {
         return taskService.getById(id);
     }

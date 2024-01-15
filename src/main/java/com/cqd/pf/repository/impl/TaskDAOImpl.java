@@ -3,6 +3,7 @@ package com.cqd.pf.repository.impl;
 import com.cqd.pf.document.Task;
 import com.cqd.pf.errorhandling.exception.ServiceException;
 import com.cqd.pf.errorhandling.message.Message;
+import com.cqd.pf.model.TaskRequest;
 import com.cqd.pf.repository.TaskDAO;
 import com.cqd.pf.repository.TaskRepository;
 import com.cqd.pf.utils.MatchResult;
@@ -37,7 +38,7 @@ public class TaskDAOImpl implements TaskDAO {
     }
 
     @Override
-    @CacheEvict(cacheNames = "task", key = "#id")
+    @CacheEvict(cacheNames = "tasks", key = "#id")
     public void saveProgress(String id, Integer progress) {
         Task task = Task.builder()
                 .id(id)
@@ -48,13 +49,26 @@ public class TaskDAOImpl implements TaskDAO {
     }
 
     @Override
-    @CacheEvict(cacheNames = "task", key = "#id")
+    @CacheEvict(cacheNames = "tasks", key = "#id")
     public void saveResult(String id, MatchResult result) {
         Task task = Task.builder()
                 .id(id)
                 .progress(100)
                 .position(result.getPosition())
                 .typos(result.getTypo())
+                .build();
+
+        taskRepository.save(task);
+    }
+
+    @Override
+    @CacheEvict(cacheNames = "tasks_id", key = "#taskRequest.toString()")
+    public void saveError(String id, TaskRequest taskRequest) {
+        Task task = Task.builder()
+                .id(id)
+                .progress(-1)
+                .position(-1)
+                .typos(-1)
                 .build();
 
         taskRepository.save(task);

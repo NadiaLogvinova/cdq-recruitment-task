@@ -5,7 +5,7 @@ import com.cqd.pf.model.TaskRequest;
 import com.cqd.pf.repository.TaskDAO;
 import com.cqd.pf.service.TaskService;
 import com.cqd.pf.utils.MatchResult;
-import com.cqd.pf.utils.MatherService;
+import com.cqd.pf.utils.MatcherService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -17,7 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TaskServiceImpl implements TaskService {
 
-    private final MatherService matherService;
+    private final MatcherService matcherService;
 
     private final TaskDAO taskDAO;
 
@@ -28,7 +28,13 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public String postTask(TaskRequest taskRequest) {
         String taskId = taskDAO.createIdle();
-        asyncExecutor.execute(() -> start(taskId, taskRequest));
+        asyncExecutor.execute(() -> {
+            try {
+                start(taskId, taskRequest);
+            } catch (Exception exception) {
+                taskDAO.saveError(taskId, taskRequest);
+            }
+        });
         return taskId;
     }
 
@@ -44,7 +50,7 @@ public class TaskServiceImpl implements TaskService {
 
     private void start(String id, TaskRequest taskRequest) {
         jobId.set(id);
-        MatchResult bestMatch = matherService.findBestMatch(taskRequest, this::saveProgress);
+        MatchResult bestMatch = matcherService.findBestMatch(taskRequest, this::saveProgress);
         saveResult(bestMatch);
         jobId.remove();
     }
