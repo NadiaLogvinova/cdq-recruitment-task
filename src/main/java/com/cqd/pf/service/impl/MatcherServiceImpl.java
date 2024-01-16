@@ -3,6 +3,7 @@ package com.cqd.pf.service.impl;
 import com.cqd.pf.config.CacheConfig;
 import com.cqd.pf.model.TaskRequest;
 import com.cqd.pf.model.MatchResult;
+import com.cqd.pf.service.MatcherService;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.cache.annotation.Cacheable;
@@ -19,6 +20,7 @@ public class MatcherServiceImpl implements MatcherService {
 
     private MatcherServiceImpl self;
 
+    // TODO: check input >= pattern
     public MatchResult findBestMatch(TaskRequest taskRequest, IntConsumer progressConsumer) {
         String input = taskRequest.getInput();
         String pattern = taskRequest.getPattern();
@@ -31,7 +33,7 @@ public class MatcherServiceImpl implements MatcherService {
             int typos = self.getTypos(input.substring(i, i + pattern.length()), pattern);
             minTypos = Math.min(minTypos, typos);
             if (minTypos == 0) {
-                new MatchResult(position, typos);
+                return new MatchResult(position, typos);
             }
         }
         return new MatchResult(position, minTypos);

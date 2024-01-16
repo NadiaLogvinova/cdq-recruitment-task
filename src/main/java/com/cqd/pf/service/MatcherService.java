@@ -1,4 +1,4 @@
-package com.cqd.pf.service.impl;
+package com.cqd.pf.service;
 
 import com.cqd.pf.model.TaskRequest;
 import com.cqd.pf.model.MatchResult;
