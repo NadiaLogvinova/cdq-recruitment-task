@@ -1,4 +1,4 @@
-package com.cqd.pf.utils;
+package com.cqd.pf.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

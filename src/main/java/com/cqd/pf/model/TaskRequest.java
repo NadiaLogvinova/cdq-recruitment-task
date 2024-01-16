@@ -12,11 +12,4 @@ public class TaskRequest {
     @NotBlank(message = "The pattern is required and can not be blank.")
     private String pattern;
 
-    // todo
-    @Override
-    public String toString() {
-        return input.concat("_")
-                .concat(pattern).concat("_")
-                .concat(String.valueOf(input.length()));
-    }
 }

@@ -3,7 +3,7 @@ package com.cqd.pf.repository;
 import com.cqd.pf.document.Task;
 import com.cqd.pf.model.Pageable;
 import com.cqd.pf.model.TaskRequest;
-import com.cqd.pf.utils.MatchResult;
+import com.cqd.pf.model.MatchResult;
 
 import java.util.List;
 

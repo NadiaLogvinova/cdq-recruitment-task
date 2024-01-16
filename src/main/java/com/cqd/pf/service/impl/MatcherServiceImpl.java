@@ -1,6 +1,8 @@
-package com.cqd.pf.utils;
+package com.cqd.pf.service.impl;
 
+import com.cqd.pf.config.CacheConfig;
 import com.cqd.pf.model.TaskRequest;
+import com.cqd.pf.model.MatchResult;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.cache.annotation.Cacheable;
@@ -13,9 +15,9 @@ import java.util.function.IntConsumer;
 @Component
 @AllArgsConstructor
 @Scope(proxyMode = ScopedProxyMode.TARGET_CLASS)
-public class MatcherService {
+public class MatcherServiceImpl implements MatcherService {
 
-    private MatcherService self;
+    private MatcherServiceImpl self;
 
     public MatchResult findBestMatch(TaskRequest taskRequest, IntConsumer progressConsumer) {
         String input = taskRequest.getInput();
@@ -36,7 +38,7 @@ public class MatcherService {
     }
 
     @SneakyThrows
-    @Cacheable(value = "substring_matcher")
+    @Cacheable(value = "substring_matcher", key = CacheConfig.SUBSTRING_MATCHER_CACHE_KEY_PATTERN)
     public int getTypos(String input, String pattern) {
         Thread.sleep(1000);
 

@@ -1,5 +1,6 @@
 package com.cqd.pf.repository.impl;
 
+import com.cqd.pf.config.CacheConfig;
 import com.cqd.pf.document.Task;
 import com.cqd.pf.errorhandling.exception.ServiceException;
 import com.cqd.pf.errorhandling.message.Message;
@@ -7,7 +8,7 @@ import com.cqd.pf.model.Pageable;
 import com.cqd.pf.model.TaskRequest;
 import com.cqd.pf.repository.TaskDAO;
 import com.cqd.pf.repository.TaskRepository;
-import com.cqd.pf.utils.MatchResult;
+import com.cqd.pf.model.MatchResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.PageRequest;
@@ -42,7 +43,7 @@ public class TaskDAOImpl implements TaskDAO {
     }
 
     @Override
-    @CacheEvict(cacheNames = "tasks", key = "#id")
+    @CacheEvict(cacheNames = "tasks", key = CacheConfig.TASK_CACHE_KEY_PATTERN)
     public void saveProgress(String id, Integer progress) {
         Task task = Task.builder()
                 .id(id)
@@ -53,7 +54,7 @@ public class TaskDAOImpl implements TaskDAO {
     }
 
     @Override
-    @CacheEvict(cacheNames = "tasks", key = "#id")
+    @CacheEvict(cacheNames = "tasks", key = CacheConfig.TASK_CACHE_KEY_PATTERN)
     public void saveResult(String id, MatchResult result) {
         Task task = Task.builder()
                 .id(id)
@@ -66,7 +67,7 @@ public class TaskDAOImpl implements TaskDAO {
     }
 
     @Override
-    @CacheEvict(cacheNames = "tasks_id", key = "#taskRequest.toString()")
+    @CacheEvict(cacheNames = "tasks_id", key = CacheConfig.TASK_REQUEST_CACHE_KEY_PATTERN)
     public void saveError(String id, TaskRequest taskRequest) {
         Task task = Task.builder()
                 .id(id)
