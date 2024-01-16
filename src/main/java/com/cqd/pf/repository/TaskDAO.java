@@ -1,9 +1,9 @@
 package com.cqd.pf.repository;
 
 import com.cqd.pf.document.Task;
+import com.cqd.pf.model.Pageable;
 import com.cqd.pf.model.TaskRequest;
 import com.cqd.pf.utils.MatchResult;
-import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -19,6 +19,6 @@ public interface TaskDAO {
 
     Task getById(String id);
 
-    List<Task> getTasks(Pageable original);
+    List<Task> getTasks(Pageable page);
 
 }

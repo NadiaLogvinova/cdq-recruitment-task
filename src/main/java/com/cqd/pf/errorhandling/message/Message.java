@@ -7,6 +7,4 @@ import lombok.NoArgsConstructor;
 public class Message {
 
     public static final String TASK_DOES_NOT_EXIST = "Task '%s' does not exist";
-    //todo
-    public static final String INTERNAL_SERVER_ERROR = "Internal server error";
 }

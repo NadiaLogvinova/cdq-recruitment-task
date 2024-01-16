@@ -1,8 +1,8 @@
 package com.cqd.pf.service;
 
 import com.cqd.pf.document.Task;
+import com.cqd.pf.model.Pageable;
 import com.cqd.pf.model.TaskRequest;
-import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -12,5 +12,5 @@ public interface TaskService {
 
     Task getById(String id);
 
-    List<Task> getTasks(Pageable pageable);
+    List<Task> getTasks(Pageable page);
 }

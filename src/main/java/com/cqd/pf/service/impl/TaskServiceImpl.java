@@ -1,13 +1,13 @@
 package com.cqd.pf.service.impl;
 
 import com.cqd.pf.document.Task;
+import com.cqd.pf.model.Pageable;
 import com.cqd.pf.model.TaskRequest;
 import com.cqd.pf.repository.TaskDAO;
 import com.cqd.pf.service.TaskService;
 import com.cqd.pf.utils.MatchResult;
 import com.cqd.pf.utils.MatcherService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 
@@ -44,8 +44,8 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public List<Task> getTasks(Pageable pageable) {
-        return taskDAO.getTasks(pageable);
+    public List<Task> getTasks(Pageable page) {
+        return taskDAO.getTasks(page);
     }
 
     private void start(String id, TaskRequest taskRequest) {
