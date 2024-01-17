@@ -7,4 +7,6 @@ import lombok.NoArgsConstructor;
 public class Message {
 
     public static final String TASK_DOES_NOT_EXIST = "Task '%s' does not exist";
+
+    public static final String INPUT_LONGER_THAN_PATTERN = "The input can not be longer than the pattern";
 }

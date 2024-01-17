@@ -27,6 +27,8 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public String postTask(TaskRequest taskRequest) {
+        matcherService.validate(taskRequest);
+
         String taskId = taskDAO.createIdle();
         asyncExecutor.execute(() -> {
             try {

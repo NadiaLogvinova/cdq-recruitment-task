@@ -9,4 +9,6 @@ public interface MatcherService {
 
     MatchResult findBestMatch(TaskRequest taskRequest, IntConsumer progressConsumer);
 
+    void validate(TaskRequest taskRequest);
+
 }

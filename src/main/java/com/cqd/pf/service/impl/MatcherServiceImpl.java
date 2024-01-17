@@ -1,14 +1,17 @@
 package com.cqd.pf.service.impl;
 
 import com.cqd.pf.config.CacheConfig;
-import com.cqd.pf.model.TaskRequest;
+import com.cqd.pf.errorhandling.exception.ServiceException;
+import com.cqd.pf.errorhandling.message.Message;
 import com.cqd.pf.model.MatchResult;
+import com.cqd.pf.model.TaskRequest;
 import com.cqd.pf.service.MatcherService;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import java.util.function.IntConsumer;
@@ -20,7 +23,13 @@ public class MatcherServiceImpl implements MatcherService {
 
     private MatcherServiceImpl self;
 
-    // TODO: check input >= pattern
+    @Override
+    public void validate(TaskRequest taskRequest) {
+        if (taskRequest.getInput().length() < taskRequest.getPattern().length()) {
+            throw new ServiceException(Message.INPUT_LONGER_THAN_PATTERN, HttpStatus.BAD_REQUEST);
+        }
+    }
+
     public MatchResult findBestMatch(TaskRequest taskRequest, IntConsumer progressConsumer) {
         String input = taskRequest.getInput();
         String pattern = taskRequest.getPattern();
