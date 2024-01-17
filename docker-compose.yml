@@ -5,8 +5,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-#    ports:
-#      - "127.0.0.1:8080:8080"
+    ports:
+      - "127.0.0.1:8080:8080"
     depends_on:
       - redis-cache
       - mongo-db
@@ -16,10 +16,10 @@ services:
 
   redis-cache:
     image: redis
-    ports:
-      - "127.0.0.1:6379:6379"
+#    ports:
+#      - "127.0.0.1:6379:6379"
 
   mongo-db:
     image: mongo
-    ports:
-      - "127.0.0.1:27017:27017"
+#    ports:
+#      - "127.0.0.1:27017:27017"
