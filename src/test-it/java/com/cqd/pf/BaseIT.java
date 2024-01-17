@@ -23,7 +23,7 @@ public class BaseIT {
     static MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo:latest");
 
     @Container
-    static RedisContainer redisContainer = new RedisContainer("latest").withExposedPorts(6379);
+    static RedisContainer redisContainer = new RedisContainer("latest");
 
     @DynamicPropertySource
     static void setProperties(DynamicPropertyRegistry registry) {

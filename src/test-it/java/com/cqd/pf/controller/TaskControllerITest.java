@@ -15,7 +15,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class TaskControllerITest extends BaseIT {
+class TaskControllerITest extends BaseIT {
 
     @Autowired
     private TaskRepository taskRepository;
@@ -29,7 +29,7 @@ public class TaskControllerITest extends BaseIT {
     }
 
     @Test
-    void test_notFound() throws Exception {
+    void getTaskById_notFound() throws Exception {
         mockMvc.perform(get("/tasks/1111")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
@@ -37,7 +37,7 @@ public class TaskControllerITest extends BaseIT {
 
     @Test
     @Timeout(15)
-    void test_getTaskById() throws Exception {
+    void getTaskById_isOk() throws Exception {
         MvcResult postResult = mockMvc.perform(post("/tasks")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{ \"input\": \"string\", \"pattern\": \"string\"}"))
