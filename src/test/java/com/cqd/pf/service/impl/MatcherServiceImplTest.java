@@ -74,12 +74,14 @@ class MatcherServiceImplTest {
     // TODO: add tests cases from email
     @Test
     void findBestMatchRequirementCases() {
+        when(matcherService.getTypos(anyString(), anyString())).thenCallRealMethod();
+
         MatchResult bestMatch = matcherServiceImpl.findBestMatch(new TaskRequest("ABCDEF", "ABC"), value -> {});
         assertEquals(0, bestMatch.getPosition());
         assertEquals(0, bestMatch.getTypo());
 
         bestMatch = matcherServiceImpl.findBestMatch(new TaskRequest("ABCDEF", "DEF"), value -> {});
-        assertEquals(0, bestMatch.getPosition());
+        assertEquals(3, bestMatch.getPosition());
         assertEquals(0, bestMatch.getTypo());
     }
 }

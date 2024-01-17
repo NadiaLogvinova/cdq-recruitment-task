@@ -31,9 +31,12 @@ public class MatcherServiceImpl implements MatcherService {
         for (int i = 0; i <= input.length() - pattern.length(); i++) {
             progressConsumer.accept(100 * i / (input.length() - pattern.length() + 1));
             int typos = self.getTypos(input.substring(i, i + pattern.length()), pattern);
-            minTypos = Math.min(minTypos, typos);
-            if (minTypos == 0) {
-                return new MatchResult(position, typos);
+            if (typos == 0) {
+                return new MatchResult(i, 0);
+            }
+            if (typos < minTypos) {
+                position = i;
+                minTypos = typos;
             }
         }
         return new MatchResult(position, minTypos);
