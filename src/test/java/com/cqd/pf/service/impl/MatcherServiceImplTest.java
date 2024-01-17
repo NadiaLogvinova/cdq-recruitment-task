@@ -10,8 +10,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.function.IntConsumer;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class MatcherServiceImplTest {
@@ -20,7 +23,7 @@ class MatcherServiceImplTest {
     private MatcherServiceImpl matcherService;
 
     @Mock
-    IntConsumer intConsumer;
+    private IntConsumer intConsumer;
 
     @InjectMocks
     private MatcherServiceImpl matcherServiceImpl;
@@ -62,6 +65,39 @@ class MatcherServiceImplTest {
     }
 
     @Test
+    void findBestMatchRequirementCases() {
+        when(matcherService.getTypos(anyString(), anyString())).thenCallRealMethod();
+
+        MatchResult bestMatch = matcherServiceImpl.findBestMatch(new TaskRequest("ABCD", "BCD"), intConsumer);
+        assertEquals(1, bestMatch.getPosition());
+        assertEquals(0, bestMatch.getTypo());
+
+        bestMatch = matcherServiceImpl.findBestMatch(new TaskRequest("ABCD", "BWD"), intConsumer);
+        assertEquals(1, bestMatch.getPosition());
+        assertEquals(1, bestMatch.getTypo());
+
+        bestMatch = matcherServiceImpl.findBestMatch(new TaskRequest("ABCDEFG", "CFG"), intConsumer);
+        assertEquals(4, bestMatch.getPosition());
+        assertEquals(1, bestMatch.getTypo());
+
+        bestMatch = matcherServiceImpl.findBestMatch(new TaskRequest("ABCABC", "ABC"), intConsumer);
+        assertEquals(0, bestMatch.getPosition());
+        assertEquals(0, bestMatch.getTypo());
+
+        bestMatch = matcherServiceImpl.findBestMatch(new TaskRequest("ABCDEFG", "TDD"), intConsumer);
+        assertEquals(1, bestMatch.getPosition());
+        assertEquals(2, bestMatch.getTypo());
+
+        bestMatch = matcherServiceImpl.findBestMatch(new TaskRequest("ABCDEF", "XABC"), intConsumer);
+        assertEquals(0, bestMatch.getPosition());
+        assertEquals(4, bestMatch.getTypo());
+
+        bestMatch = matcherServiceImpl.findBestMatch(new TaskRequest("ABCDEF", "DEFX"), intConsumer);
+        assertEquals(0, bestMatch.getPosition());
+        assertEquals(4, bestMatch.getTypo());
+    }
+
+    @Test
     void getTypos() {
         assertEquals(0, matcherServiceImpl.getTypos("11111", "11111"));
         assertEquals(1, matcherServiceImpl.getTypos("11111", "11112"));
@@ -69,19 +105,5 @@ class MatcherServiceImplTest {
         assertEquals(3, matcherServiceImpl.getTypos("11111", "21212"));
         assertEquals(4, matcherServiceImpl.getTypos("11111", "22122"));
         assertEquals(5, matcherServiceImpl.getTypos("11111", "22222"));
-    }
-
-    // TODO: add tests cases from email
-    @Test
-    void findBestMatchRequirementCases() {
-        when(matcherService.getTypos(anyString(), anyString())).thenCallRealMethod();
-
-        MatchResult bestMatch = matcherServiceImpl.findBestMatch(new TaskRequest("ABCDEF", "ABC"), value -> {});
-        assertEquals(0, bestMatch.getPosition());
-        assertEquals(0, bestMatch.getTypo());
-
-        bestMatch = matcherServiceImpl.findBestMatch(new TaskRequest("ABCDEF", "DEF"), value -> {});
-        assertEquals(3, bestMatch.getPosition());
-        assertEquals(0, bestMatch.getTypo());
     }
 }
