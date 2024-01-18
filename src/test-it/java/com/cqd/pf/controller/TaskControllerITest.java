@@ -11,6 +11,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -29,6 +30,18 @@ class TaskControllerITest extends BaseIT {
     }
 
     @Test
+    void postTask_isCreated_returnId() throws Exception {
+        MvcResult postResult = mockMvc.perform(post("/tasks")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{ \"input\": \"string\", \"pattern\": \"string\"}"))
+                .andExpect(status().isCreated())
+                .andReturn();
+        String id = postResult.getResponse().getContentAsString();
+
+        assertNotNull(id);
+    }
+
+    @Test
     void getTaskById_notFound() throws Exception {
         mockMvc.perform(get("/tasks/1111")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -37,21 +50,20 @@ class TaskControllerITest extends BaseIT {
 
     @Test
     @Timeout(15)
-    void getTaskById_isOk() throws Exception {
+    void getTaskById_isOk_readFromDbAndCache() throws Exception {
         MvcResult postResult = mockMvc.perform(post("/tasks")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{ \"input\": \"string\", \"pattern\": \"string\"}"))
-                .andExpect(status().isOk())
                 .andReturn();
         String id = postResult.getResponse().getContentAsString();
 
-        MvcResult getResult;
+        MvcResult getResultFromDb;
         do {
-            getResult = mockMvc.perform(get("/tasks/" + id)
+            getResultFromDb = mockMvc.perform(get("/tasks/" + id)
                             .contentType(MediaType.APPLICATION_JSON))
                     .andExpect(status().isOk())
                     .andReturn();
-        } while (!getResult.getResponse().getContentAsString().contains("\"progress\":100"));
+        } while (!getResultFromDb.getResponse().getContentAsString().contains("\"progress\":100"));
 
         // clear DB.
         cleanUp();
@@ -61,6 +73,31 @@ class TaskControllerITest extends BaseIT {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        assertEquals(getResult.getResponse().getContentAsString(), getResultFromCache.getResponse().getContentAsString());
+        assertEquals(getResultFromDb.getResponse().getContentAsString(), getResultFromCache.getResponse().getContentAsString());
+    }
+
+    @Test
+    void getTasks_isOk() throws Exception {
+
+        int page = 0;
+        int pageSize = 5;
+
+        mockMvc.perform(post("/tasks")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{ \"input\": \"string1\", \"pattern\": \"string\"}"));
+
+        mockMvc.perform(post("/tasks")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{ \"input\": \"string2\", \"pattern\": \"string\"}"))
+                .andReturn();
+
+        mockMvc
+                .perform(
+                        get("/tasks")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .param("page", String.valueOf(page))
+                                .param("size", String.valueOf(pageSize))
+                )
+                .andExpect(status().isOk());
     }
 }
