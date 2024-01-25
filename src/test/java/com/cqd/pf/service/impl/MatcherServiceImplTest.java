@@ -72,7 +72,7 @@ class MatcherServiceImplTest {
     }
 
     @Test
-    void findBestMatchRequirementCases() {
+    void findBestMatch_requirementCases() {
         when(matcherService.getTypos(anyString(), anyString())).thenCallRealMethod();
 
         MatchResult bestMatch = underTest.findBestMatch(new TaskRequest("ABCD", "BCD"), intConsumer);
@@ -105,7 +105,7 @@ class MatcherServiceImplTest {
     }
 
     @Test
-    void getTypos() {
+    void getTypos_typoCases() {
         assertEquals(0, underTest.getTypos("11111", "11111"));
         assertEquals(1, underTest.getTypos("11111", "11112"));
         assertEquals(2, underTest.getTypos("11111", "12121"));
